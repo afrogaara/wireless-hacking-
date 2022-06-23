@@ -1,0 +1,5 @@
+- > https://api.ipify.org/
+- > 143.202.46.xx ( nosso ip público ) 
+
+nmap -sV -F 143.202.46.x/24 
+nmao -sV 143.202.46.x/24 -p21,22,443,80

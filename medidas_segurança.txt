@@ -1,0 +1,23 @@
+
+1 ) não usar redes wifi públicas 
+2 ) não divulgar senhas 
+3 ) usar sites com HTTPS 
+4 ) Usar DNS confiável no computador e assim subscrever o usado no roteador.
+5 ) Desonfiar de pedidos de download ou páginas de login 
+
+
+No roteador: 
+1 ) usar autenticação WPA2
+2 ) usar criptografia AES/CCMP
+3 ) Desabilitar WPS
+4 ) senhas fortes
+5 ) não compartilhar senhas 
+6 ) desabilitar conexão remota 
+7 ) mudar senha padrão do roteador 
+8 ) atualizar firmware 
+
+
+
+WIPS - > Wireless Intrusion Prevention System 
+WIDS - > Wireless Detection System 
+http://openwips-ng.org/
